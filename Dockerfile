@@ -14,8 +14,6 @@ RUN apt-get update && \
     apt-get install -qy openjdk-8-jdk && \
 # Install maven
     apt-get install -qy maven && \
-# Install docker client
-    apt-get install -qy docker.io && \
 # Cleanup old packages
     apt-get -qy autoremove && \
 # Add user jenkins to the image
