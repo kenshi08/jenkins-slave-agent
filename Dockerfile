@@ -37,12 +37,6 @@ RUN echo "jenkins:jenkins" | chpasswd && mkdir /home/jenkins/.m2
 RUN usermod -aG docker jenkins
 RUN usermod -aG sudo jenkins
 
-# Copy authorized keys
-COPY .ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
-
-RUN chown -R jenkins:jenkins /home/jenkins/.m2/ && \
-    chown -R jenkins:jenkins /home/jenkins/.ssh/
-
 # Standard SSH port
 EXPOSE 22
 
