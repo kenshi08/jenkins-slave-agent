@@ -3,26 +3,38 @@ FROM ubuntu:18.04
 LABEL maintainer="Clement Wong <kenshi08@gmail.com>"
 
 # Make sure the package repository is up to date.
-RUN apt-get update && \
-    apt-get -qy full-upgrade && \
-    apt-get install -qy git && \
+RUN apt-get update -qq && apt-get -qy full-upgrade && apt-get install -qqy git  
 # Install a basic SSH server
-    apt-get install -qy openssh-server && \
+RUN apt-get install -qqy openssh-server && \
     sed -i 's|session    required     pam_loginuid.so|session    optional     pam_loginuid.so|g' /etc/pam.d/sshd && \
-    mkdir -p /var/run/sshd && \
-# Install JDK 8 (latest stable edition at 2019-04-01)
-    apt-get install -qy openjdk-8-jdk && \
-# Install maven
-    apt-get install -qy maven && \
+    mkdir -p /var/run/sshd
+# Install JDK 8 (latest stable edition at 2019-04-01) and Docker stuff
+RUN apt-get install -qqy openjdk-8-jdk \ 
+    maven \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    lxc \
+    iptables
 # Cleanup old packages
-    apt-get -qy autoremove && \
+RUN apt-get -qqy autoremove
 # Add user jenkins to the image
-    adduser --quiet jenkins && \
+RUN adduser --quiet jenkins
 # Set password for the jenkins user (you may want to alter this).
-    echo "jenkins:jenkins" | chpasswd && \
+RUN echo "jenkins:jenkins" | chpasswd && 
     mkdir /home/jenkins/.m2
+
+# Install the magic wrapper.
+ADD ./wrapdocker /usr/local/bin/wrapdocker
+RUN chmod +x /usr/local/bin/wrapdocker
+
+# Define additional metadata for our image.
+VOLUME /var/lib/docker
+
+# Install Docker from Docker Inc. repositories.
+RUN curl -sSL https://get.docker.com/ | sh
 
 # Standard SSH port
 EXPOSE 22
 
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/sbin/sshd", "-D", "wrapdocker"]
