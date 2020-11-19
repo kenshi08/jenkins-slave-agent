@@ -33,6 +33,12 @@ VOLUME /var/lib/docker
 # Install Docker from Docker Inc. repositories.
 RUN curl -sSL https://get.docker.com/ | sh
 
+# Copy authorized keys
+COPY .ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
+
+RUN chown -R jenkins:jenkins /home/jenkins/.m2/ && \
+    chown -R jenkins:jenkins /home/jenkins/.ssh/
+
 # Standard SSH port
 EXPOSE 22
 
