@@ -15,7 +15,8 @@ RUN apt-get install -qqy openjdk-8-jdk \
     ca-certificates \
     curl \
     lxc \
-    iptables
+    iptables \
+    netcat
 
 # Install Docker from Docker Inc. repositories.
 RUN curl -sSL https://get.docker.com/ | sh
