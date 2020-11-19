@@ -20,6 +20,10 @@ RUN apt-get install -qqy openjdk-8-jdk \
 # Install Docker from Docker Inc. repositories.
 RUN curl -sSL https://get.docker.com/ | sh
 
+# Install the magic wrapper.
+ADD ./wrapdocker /usr/local/bin/wrapdocker
+RUN chmod +x /usr/local/bin/wrapdocker
+
 # Cleanup old packages
 RUN apt-get -qqy autoremove
 
@@ -30,16 +34,8 @@ RUN adduser --quiet jenkins
 RUN echo "jenkins:jenkins" | chpasswd && mkdir /home/jenkins/.m2
 
 # add user to docker/sudo group
-RUN groupadd docker
 RUN usermod -aG docker jenkins
 RUN usermod -aG sudo jenkins
-
-# Install the magic wrapper.
-ADD ./wrapdocker /usr/local/bin/wrapdocker
-RUN chmod +x /usr/local/bin/wrapdocker
-
-# Define additional metadata for our image.
-VOLUME /var/lib/docker
 
 # Copy authorized keys
 COPY .ssh/authorized_keys /home/jenkins/.ssh/authorized_keys
@@ -49,5 +45,8 @@ RUN chown -R jenkins:jenkins /home/jenkins/.m2/ && \
 
 # Standard SSH port
 EXPOSE 22
+
+# Define additional metadata for our image.
+VOLUME /var/lib/docker
 
 CMD ["/usr/sbin/sshd", "-D", "wrapdocker"]
